@@ -83,6 +83,8 @@ class ToDoListViewController: UITableViewController {
             // what will happen once the user clicks the Add Item button on out UIAlert
             
             self.itemArray.append(textField.text!)
+            
+            // refreshes table view to load new item
             self.tableView.reloadData()
             
         }
