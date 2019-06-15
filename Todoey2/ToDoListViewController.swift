@@ -13,9 +13,23 @@ class ToDoListViewController: UITableViewController {
     
     var itemArray = ["Find Mike", "Buy Eggos", "Destroy Demogrogron"]
     
+    // persistent data
+    let defaults = UserDefaults.standard
+    
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
+        
+        // load persistent data & update for condition if there's no array
+        
+        //itemArray = defaults.array(forKey: "ToDoListArray") as! [String] and get rid
+        // of force down cast, make it optional
+        
+        if let items = defaults.array(forKey: "ToDoListArray") as? [String] {
+            itemArray = items
+        }
+        
     }
     
     
@@ -83,6 +97,13 @@ class ToDoListViewController: UITableViewController {
             // what will happen once the user clicks the Add Item button on out UIAlert
             
             self.itemArray.append(textField.text!)
+            
+            // save our appended array to the user defaults
+            
+            self.defaults.set(self.itemArray, forKey: "ToDoListArray")
+            //defaults.set(self.itemArray, forKey: "")
+            
+            
             
             // refreshes table view to load new item
             self.tableView.reloadData()
