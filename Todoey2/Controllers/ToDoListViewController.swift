@@ -18,7 +18,7 @@ class ToDoListViewController: UITableViewController {
 //    var itemArray = ["Find Mike", "Buy Eggos", "Destroy Demogrogrons", "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", ",q", "r", "s", "t", "u", "v", "w", "x", "y", "z"]
     
     // persistent data
-    //let defaults = UserDefaults.standard
+    let defaults = UserDefaults.standard
     
     
     override func viewDidLoad() {
@@ -27,13 +27,9 @@ class ToDoListViewController: UITableViewController {
         
         // load persistent data & update for condition if there's no array
         
-        //itemArray = defaults.array(forKey: "ToDoListArray") as! [String] and get rid
-        // of force down cast, make it optional
+       
         
-//        if let items = defaults.array(forKey: "ToDoListArray") as? [String] {
-//            itemArray = items
-        
-        
+       
         // creating new item objects
         let newItem = Item()
         newItem.title = "Find Mike"
@@ -47,6 +43,17 @@ class ToDoListViewController: UITableViewController {
         let newItem3 = Item()
         newItem3.title = "Destroy Demogorgon"
         itemArray.append(newItem3)
+        
+        //itemArray = defaults.array(forKey: "ToDoListArray") as! [String] and get rid
+        // of force down cast, make it optional
+        
+        
+        
+        
+        if let items = defaults.array(forKey: "ToDoListArray") as? [Item] {
+            itemArray = items
+            
+        }
         
         // let's test our solution for duplicate checkmark
         
@@ -211,15 +218,11 @@ class ToDoListViewController: UITableViewController {
             
             self.itemArray.append(newItem)
             
-            
-            
-            
             // save our appended array to the user defaults
             
-          //  self.defaults.set(self.itemArray, forKey: "ToDoListArray")
+            self.defaults.set(self.itemArray, forKey: "ToDoListArray")
+            
             //defaults.set(self.itemArray, forKey: "")
-            
-            
             
             // refreshes table view to load new item
             self.tableView.reloadData()
