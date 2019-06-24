@@ -8,7 +8,7 @@
 
 import Foundation
 
-class Item {
+class Item: Encodable {
     
     // define two properties for class Item
         var done : Bool = false

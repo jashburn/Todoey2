@@ -13,12 +13,10 @@ class ToDoListViewController: UITableViewController {
     // turn array into an array of item objects
     
     var itemArray = [Item]()
-
-    
-//    var itemArray = ["Find Mike", "Buy Eggos", "Destroy Demogrogrons", "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", ",q", "r", "s", "t", "u", "v", "w", "x", "y", "z"]
-    
+  
     // persistent data
-    let defaults = UserDefaults.standard
+    //let defaults = UserDefaults.standard
+       let dataFilePath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first?.appendingPathComponent("Items.plist")
     
     
     override func viewDidLoad() {
@@ -26,10 +24,13 @@ class ToDoListViewController: UITableViewController {
         // Do any additional setup after loading the view.
         
         // load persistent data & update for condition if there's no array
+    
+     
         
-       
         
-       
+        print(dataFilePath)
+        
+    
         // creating new item objects
         let newItem = Item()
         newItem.title = "Find Mike"
@@ -44,41 +45,7 @@ class ToDoListViewController: UITableViewController {
         newItem3.title = "Destroy Demogorgon"
         itemArray.append(newItem3)
         
-        //itemArray = defaults.array(forKey: "ToDoListArray") as! [String] and get rid
-        // of force down cast, make it optional
-        
-        
-        
-        
-        if let items = defaults.array(forKey: "ToDoListArray") as? [Item] {
-            itemArray = items
-            
-        }
-        
-        // let's test our solution for duplicate checkmark
-        
-//        itemArray.append(newItem3)
-//        itemArray.append(newItem3)
-//        itemArray.append(newItem3)
-//        itemArray.append(newItem3)
-//        itemArray.append(newItem3)
-//        itemArray.append(newItem3)
-//        itemArray.append(newItem3)
-//        itemArray.append(newItem3)
-//        itemArray.append(newItem3)
-//        itemArray.append(newItem3)
-//        itemArray.append(newItem3)
-//        itemArray.append(newItem3)
-//        itemArray.append(newItem3)
-//        itemArray.append(newItem3)
-//        itemArray.append(newItem3)
-//        itemArray.append(newItem3)
-//        itemArray.append(newItem3)
-//        itemArray.append(newItem3)
-//        itemArray.append(newItem3)
-//        itemArray.append(newItem3)
-        
-//        }
+
         
     }
     
@@ -119,27 +86,7 @@ class ToDoListViewController: UITableViewController {
         
         cell.accessoryType = item.done == true ? .checkmark : .none
         
-        
-        
-        
-        
-        // eliminate the line below** 
-        
-//        // update in refactoring - will eliminate or replace this with the ternary operator
-//        if item.done == true {
-//            cell.accessoryType = .checkmark
-//        }
-//        else {
-//            cell.accessoryType = .none
-//        }
-        
-        
-//        if itemArray[indexPath.row].done == true {
-//            cell.accessoryType = .checkmark
-//        }
-//        else {
-//            cell.accessoryType = .none
-//        }
+
         
         
         return cell
@@ -147,36 +94,22 @@ class ToDoListViewController: UITableViewController {
     
     //MARK - TableView Delegate Methods
     
-
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-//        print(indexPath.row) // print row
-//        print(itemArray[indexPath.row])
+  
+     
+        //set the done property/ toggle the item
         
         
-        // grab a reference to the cell which is at a paticular index path
-        
-        //tableView.cellForRow(at: indexPath)?.accessoryType = .checkmark
-        
-        // now the code to remove the checkmark
-        
-       // **this is gone because of above.
-        
-//        if tableView.cellForRow(at: indexPath)?.accessoryType == .checkmark {
-//            // change it to none
-//            tableView.cellForRow(at: indexPath)?.accessoryType = .none
-//
+//        if itemArray[indexPath.row].done == false {
+//            itemArray[indexPath.row].done = true
 //        }
 //        else {
-//            tableView.cellForRow(at: indexPath)?.accessoryType = .checkmark
+//            itemArray[indexPath.row].done = false
 //        }
         
-        //set the done property
-        if itemArray[indexPath.row].done == false {
-            itemArray[indexPath.row].done = true
-        }
-        else {
-            itemArray[indexPath.row].done = false
-        }
+        // I was missing this line for toggling the checkmark
+        itemArray[indexPath.row].done = !itemArray[indexPath.row].done
+        
         
         // Add this magic function to retrigger the delegate method once we've changed the done property
         
@@ -187,7 +120,13 @@ class ToDoListViewController: UITableViewController {
         
         tableView.deselectRow(at: indexPath, animated: true)
         
+        saveItems()
+        
     }
+    
+    
+    
+    
     
     
     //MARK - Add New Items
@@ -196,7 +135,6 @@ class ToDoListViewController: UITableViewController {
     @IBAction func addButtonPressed(_ sender: UIBarButtonItem) {
         
         var textField = UITextField()
-        
         
         let alert = UIAlertController (title: "Add New Todey Item", message: "", preferredStyle: .alert)
        // var newItem = alertTextField
@@ -211,7 +149,6 @@ class ToDoListViewController: UITableViewController {
             newItem.title = textField.text!
             
             
-            
             // this doesn't work after changing to array of objects
             //self.itemArray.append(textField.text!)
             // and here's what works for appending
@@ -220,12 +157,16 @@ class ToDoListViewController: UITableViewController {
             
             // save our appended array to the user defaults
             
-            self.defaults.set(self.itemArray, forKey: "ToDoListArray")
+            // self.defaults.set(self.itemArray, forKey: "ToDoListArray")
+            
+            // from the above using User defaults to changing to use NS Coder
+            
+            self.saveItems()
             
             //defaults.set(self.itemArray, forKey: "")
             
             // refreshes table view to load new item
-            self.tableView.reloadData()
+           // removed because the saveItems function has it -  self.tableView.reloadData()
             
         }
         
@@ -250,7 +191,28 @@ class ToDoListViewController: UITableViewController {
     
     
     
-
+    
+    func saveItems() {
+        
+        let encoder = PropertyListEncoder()
+        
+        do {
+            // this encodes the data
+            let data = try encoder.encode(self.itemArray)
+            // this writes the data to our data file path
+            try data.write(to: self.dataFilePath!)
+        }
+            
+        catch {
+            // print out the encoding error
+            print("Error encoding item array, \(error)")
+            
+        }
+         self.tableView.reloadData()
+        
+    }
+    
+    
 
 }
 
