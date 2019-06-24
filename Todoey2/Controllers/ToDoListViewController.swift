@@ -163,10 +163,7 @@ class ToDoListViewController: UITableViewController {
             
             self.saveItems()
             
-            //defaults.set(self.itemArray, forKey: "")
-            
-            // refreshes table view to load new item
-           // removed because the saveItems function has it -  self.tableView.reloadData()
+     
             
         }
         
