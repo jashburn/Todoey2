@@ -25,27 +25,12 @@ class ToDoListViewController: UITableViewController {
         
         // load persistent data & update for condition if there's no array
     
-     
-        
-        
-        print(dataFilePath)
+        //print(dataFilePath) - path set for plist with NSCoder
         
     
-        // creating new item objects
-        let newItem = Item()
-        newItem.title = "Find Mike"
-        //newItem.done = true
-        itemArray.append(newItem)
+        //loading saved items
         
-        let newItem2 = Item()
-        newItem2.title = "Buy Eggos"
-        itemArray.append(newItem2)
-        
-        let newItem3 = Item()
-        newItem3.title = "Destroy Demogorgon"
-        itemArray.append(newItem3)
-        
-
+       loadItems()
         
     }
     
@@ -192,6 +177,7 @@ class ToDoListViewController: UITableViewController {
     func saveItems() {
         
         let encoder = PropertyListEncoder()
+      
         
         do {
             // this encodes the data
@@ -209,7 +195,17 @@ class ToDoListViewController: UITableViewController {
         
     }
     
+    func loadItems() {
+        let data = try? Data(contentsOf: dataFilePath!)
+        let decoder = PropertyListDecoder()
+        
+        do {
+        itemArray = try decoder.decode([Item].self, from: data!)
+        }
+        catch {
+            print("Error decoding item array, \(error)")
+        }
+    }
     
-
 }
 
